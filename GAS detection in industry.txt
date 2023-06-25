@@ -1,0 +1,99 @@
+
+
+///// DESIGN GASSENSING
+
+module GasSensor(
+  input wire clk,          // Clock input
+  input wire reset,        // Reset input
+  input wire gasInput,     // Gas level input
+
+  output reg gasAlert      // Gas alert output
+);
+  
+  // Internal signals
+  reg [7:0] gasThreshold;    // Gas threshold level
+  reg [7:0] gasReading;      // Current gas reading
+
+  // Initialize gas threshold and gas reading  
+
+    initial begin
+    gasThreshold = 8'h50;    // Set the gas threshold to 80
+    gasReading = 8'h00;     // Initialize gas reading to 0
+  end   
+
+  // Gas sensing process
+
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      gasReading <= 8'h00; // Reset gas reading to 0
+      gasAlert <= 1'b0;   // Reset gas alert signal
+    end
+    else begin
+                         // Update gas reading
+      if (gasInput > gasReading)
+        gasReading <= gasInput;
+      
+                        // Check if gas reading exceeds the threshold
+      if (gasReading > gasThreshold)
+        gasAlert <= 1'b1;
+      else
+        gasAlert <= 1'b0;
+    end
+  end
+endmodule
+
+/////////////TESTBECH FOR GASSENSING ELEMENT
+
+module GasSensor_TB;
+  
+  reg clk;                 // Testbench clock
+  reg reset;              // Testbench reset
+  reg gasInput;          // Testbench gas input
+
+  wire gasAlert;         // Gas alert signal from the module
+
+  // Instantiate the module under test
+  
+  GasSensor dut (
+    .clk(clk),
+    .reset(reset),
+    .gasInput(gasInput),
+    .gasAlert(gasAlert)
+  );
+
+  // Clock generation
+ 
+  always #5 clk = ~clk;               // Generate a clock with 10ns period
+
+  // Testbench stimulus
+
+  initial begin
+    // Initialize inputs
+    clk = 0;
+    reset = 1;
+    gasInput = 8'h00;
+
+    // Wait for a few clock cycles
+
+    #10 reset = 0;
+
+    // Test case 1: Gas reading below threshold
+
+    #20 gasInput = 8'h40;        // Set gas input to 64
+    #50 $display("Gas Alert: %b", gasAlert);
+
+    // Test case 2: Gas reading above threshold
+
+    #20 gasInput = 8'h80; // Set gas input to 128
+    #50 $display("Gas Alert: %b", gasAlert);
+
+    // Test case 3: Gas reading equal to threshold
+
+    #20 gasInput = 8'h50; // Set gas input to 80
+    #50 $display("Gas Alert: %b", gasAlert);
+
+    // Finish simulation
+    #10 $finish;
+  end
+endmodule
+

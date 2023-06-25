@@ -1,0 +1,68 @@
+
+
+/////////////////DESIGN.HALF_ADDER
+
+
+module half_adder 
+  (
+   i_D1,
+   i_D2,
+   o_sum,
+   o_carry
+   );
+ 
+  input  i_D1;
+  input  i_D2;
+  output o_sum;
+  output o_carry;
+ 
+  assign o_sum   = i_D1 ^ i_D2;  // bitwise xor
+  assign o_carry = i_D1 & i_D2;  // bitwise and
+ 
+endmodule
+
+
+
+
+//////////////TESTBENCH.HALF_ADDER
+
+
+module half_adder_tb;
+ 
+  reg r_D1 = 0;
+  reg r_D2 = 0;
+  wire w_SUM;
+  wire w_CARRY;
+   
+  half_adder half_adder_inst
+    (
+     .i_D1(r_D1),
+     .i_D2(r_D2),
+     .o_sum(w_SUM),
+     .o_carry(w_CARRY)
+     );
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(1);
+  end
+ 
+  initial
+    begin
+      r_D1 = 1'b0;
+      r_D2 = 1'b0;
+      #10;
+      r_D1 = 1'b0;
+      r_D2 = 1'b1;
+      #10;
+      r_D1 = 1'b1;
+      r_D2 = 1'b0;
+      #10;
+      r_D1 = 1'b1;
+      r_D2 = 1'b1;
+      #10;
+    end 
+ 
+endmodule
+
+
+

@@ -1,0 +1,80 @@
+
+///////// DESIGN.2-BIT_RIPPLE_CARRY_ADDER
+
+module ripple_carry_adder_2_FA 
+  (
+   input [1:0]  i_add_term1,
+   input [1:0]  i_add_term2,
+   output [2:0] o_result
+   );
+     
+  wire [2:0]    w_CARRY;
+  wire [1:0]    w_SUM;
+   
+  // No carry input on first full adder  
+  assign w_CARRY[0] = 1'b0;
+   
+  full_adder full_adder_1
+    ( 
+      .i_D1(i_add_term1[0]),
+      .i_D2(i_add_term2[0]),
+      .i_carry(w_CARRY[0]),
+      .o_sum(w_SUM[0]),
+      .o_carry(w_CARRY[1])
+      );
+ 
+  full_adder full_adder_2
+    ( 
+      .i_D1(i_add_term1[1]),
+      .i_D2(i_add_term2[1]),
+      .i_carry(w_CARRY[1]),
+      .o_sum(w_SUM[1]),
+      .o_carry(w_CARRY[2])
+      );
+   
+  assign o_result = {w_CARRY[2], w_SUM};   // Verilog Concatenation
+ 
+endmodule 
+
+
+
+
+//////////////////////TESTBENCH.2-BIT_RIPPLE_CARRY_ADDER
+
+
+
+
+module ripple_carry_adder_tb ();
+ 
+  parameter WIDTH = 2;
+ 
+  reg [WIDTH-1:0] r_ADD_1 = 0;
+  reg [WIDTH-1:0] r_ADD_2 = 0;
+  wire [WIDTH:0]  w_RESULT;
+   
+  ripple_carry_adder #(.WIDTH(WIDTH)) ripple_carry_inst
+    (
+     .i_add_term1(r_ADD_1),
+     .i_add_term2(r_ADD_2),
+     .o_result(w_RESULT)
+     );
+ 
+  initial
+    begin
+      #10;
+      r_ADD_1 = 2'b00;
+      r_ADD_2 = 2'b01;
+      #10;
+      r_ADD_1 = 2'b10;
+      r_ADD_2 = 2'b01;
+      #10;
+      r_ADD_1 = 2'b01;
+      r_ADD_2 = 2'b11;
+      #10;
+      r_ADD_1 = 2'b11;
+      r_ADD_2 = 2'b11;
+      #10;
+    end
+ 
+endmodule
+
